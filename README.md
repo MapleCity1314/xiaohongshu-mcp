@@ -2,6 +2,19 @@
 
 Independent Xiaohongshu MCP server with a Rust native bridge and a vendored legacy Python fallback.
 
+Current repository focus: read-only Xiaohongshu information retrieval.
+
+The MCP surface in this repository is intentionally limited to reads and diagnostics:
+
+- auth status and runtime self-check
+- profile reads
+- search and topic discovery
+- note detail and comments
+- user lookup and user posts
+- feed, hot items, favorites, unread counts, notifications
+
+It does not currently expose write operations such as posting, liking, commenting, following, or deleting through MCP.
+
 Current shape:
 
 - npm-bootable MCP server: `xiaohongshu-mcp`
@@ -39,6 +52,35 @@ The native layer already supports live note reads. Other commands still fall bac
 Diagnostic MCP tool:
 
 - `xiaohongshu_runtime_self_check`
+
+Read-only MCP tools:
+
+- `xiaohongshu_auth_status`
+- `xiaohongshu_runtime_self_check`
+- `xiaohongshu_profile_me`
+- `xiaohongshu_search`
+- `xiaohongshu_note_detail`
+- `xiaohongshu_comments`
+- `xiaohongshu_user_lookup`
+- `xiaohongshu_user_posts`
+- `xiaohongshu_feed`
+- `xiaohongshu_hot`
+- `xiaohongshu_topics`
+- `xiaohongshu_search_user`
+- `xiaohongshu_favorites`
+- `xiaohongshu_my_notes`
+- `xiaohongshu_unread`
+- `xiaohongshu_notifications`
+
+Typical read workflow:
+
+1. Check bridge and auth state with `xiaohongshu_runtime_self_check` and `xiaohongshu_auth_status`.
+2. Search with `xiaohongshu_search` or `xiaohongshu_topics`.
+3. Read note content with `xiaohongshu_note_detail`.
+4. Pull discussion with `xiaohongshu_comments`.
+5. Expand to authors with `xiaohongshu_user_lookup` and `xiaohongshu_user_posts`.
+
+Additional integration notes live in [references/read-only-workflow.md](/Users/presto/code/work/xiaohongshu-mcp/references/read-only-workflow.md).
 
 Development:
 

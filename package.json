@@ -23,6 +23,7 @@
     "agents",
     "bin",
     "dist",
+    "references",
     "legacy/README.md",
     "legacy/SCHEMA.md",
     "legacy/SKILL.md",

@@ -82,10 +82,26 @@ test("xiaohongshu MCP lists tools and returns a structured self-check result", a
   const messages = readMessages(stdoutChunks);
   const toolsList = messages.find((message) => message.id === 2);
   const selfCheck = messages.find((message) => message.id === 3);
+  const toolNames = toolsList.result.tools.map((tool) => tool.name).sort();
 
   assert.ok(toolsList);
-  assert.ok(
-    toolsList.result.tools.some((tool) => tool.name === "xiaohongshu_runtime_self_check"),
-  );
+  assert.deepEqual(toolNames, [
+    "xiaohongshu_auth_status",
+    "xiaohongshu_comments",
+    "xiaohongshu_favorites",
+    "xiaohongshu_feed",
+    "xiaohongshu_hot",
+    "xiaohongshu_my_notes",
+    "xiaohongshu_note_detail",
+    "xiaohongshu_notifications",
+    "xiaohongshu_profile_me",
+    "xiaohongshu_runtime_self_check",
+    "xiaohongshu_search",
+    "xiaohongshu_search_user",
+    "xiaohongshu_topics",
+    "xiaohongshu_unread",
+    "xiaohongshu_user_lookup",
+    "xiaohongshu_user_posts",
+  ]);
   assert.equal(selfCheck.result.structuredContent.ok, false);
 });

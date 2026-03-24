@@ -1,7 +1,9 @@
 {
   "name": "@presto1314w/xiaohongshu-mcp",
   "version": "0.1.0",
+  "description": "Independent Xiaohongshu MCP server with a Rust native bridge and vendored legacy fallback.",
   "private": false,
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -40,6 +42,25 @@
     "@biomejs/biome": "2.2.0",
     "@types/node": "^24.5.2",
     "typescript": "5.9.2"
+  },
+  "keywords": [
+    "xiaohongshu",
+    "xhs",
+    "mcp",
+    "little-red-book",
+    "agent",
+    "cli"
+  ],
+  "homepage": "https://github.com/MapleCity1314/xiaohongshu-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/MapleCity1314/xiaohongshu-mcp/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MapleCity1314/xiaohongshu-mcp.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {

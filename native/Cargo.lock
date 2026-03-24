@@ -1270,6 +1270,23 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9edde0db4769d2dc68579893f2306b26c6ecfbe0ef499b013d731b7b9247e0b9"
 
 [[package]]
+name = "xiaohongshu-cli"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "xiaohongshu-core",
+]
+
+[[package]]
+name = "xiaohongshu-core"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "yoke"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1290,23 +1307,6 @@ dependencies = [
  "quote",
  "syn",
  "synstructure",
-]
-
-[[package]]
-name = "xiaohongshu-cli"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "xiaohongshu-core",
-]
-
-[[package]]
-name = "xiaohongshu-core"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "serde",
- "serde_json",
 ]
 
 [[package]]

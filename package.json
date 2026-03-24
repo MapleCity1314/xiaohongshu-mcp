@@ -35,6 +35,7 @@
     "build": "pnpm run build:ts && pnpm run build:native",
     "build:ts": "pnpm exec tsc -p tsconfig.build.json",
     "build:native": "node ./scripts/build-native.mjs",
+    "self-check": "node ./scripts/self-check.mjs",
     "lint": "biome lint .",
     "format": "biome format --write src test bin scripts",
     "check-types": "pnpm exec tsc --noEmit",

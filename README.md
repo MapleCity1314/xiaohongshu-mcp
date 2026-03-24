@@ -86,8 +86,24 @@ Development:
 
 ```bash
 pnpm install
+pnpm self-check
 pnpm build
 pnpm test
 pnpm release:pack
 XIAOHONGSHU_MCP_RELEASE_TARGETS=darwin-arm64,linux-x64 pnpm release:matrix
 ```
+
+CLI self-check:
+
+```bash
+pnpm self-check
+pnpm self-check --json
+pnpm self-check --no-auth-probe
+```
+
+This prints a structured local diagnostic that combines:
+
+- runtime bridge resolution
+- native binary discovery
+- packaged artifact visibility
+- an optional `status --json` auth probe through the resolved bridge

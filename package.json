@@ -36,6 +36,8 @@
     "build:ts": "pnpm exec tsc -p tsconfig.build.json",
     "build:native": "node ./scripts/build-native.mjs",
     "self-check": "node ./scripts/self-check.mjs",
+    "demo:search": "node ./scripts/demo-read.mjs search",
+    "demo:note": "node ./scripts/demo-read.mjs note",
     "lint": "biome lint .",
     "format": "biome format --write src test bin scripts",
     "check-types": "pnpm exec tsc --noEmit",

@@ -99,6 +99,8 @@ Primary environment variables:
 ```bash
 pnpm install
 pnpm self-check
+pnpm demo:search -- travel
+pnpm demo:note -- <id-or-url>
 pnpm build
 pnpm test
 pnpm release:pack
@@ -121,3 +123,12 @@ pnpm self-check --probe-search travel
 - packaged artifact visibility
 - optional auth probe via `status --json`
 - optional search probe via `search --json`
+
+## Demo Commands
+
+```bash
+pnpm demo:search -- travel
+pnpm demo:note -- https://www.xiaohongshu.com/explore/<id>
+```
+
+These commands are the smallest real read-path demos in the repository. They go through the same bridge resolution rules as the MCP server and print structured JSON results.

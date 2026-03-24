@@ -99,6 +99,7 @@ CLI self-check:
 pnpm self-check
 pnpm self-check --json
 pnpm self-check --no-auth-probe
+pnpm self-check --probe-search travel
 ```
 
 This prints a structured local diagnostic that combines:
@@ -107,3 +108,4 @@ This prints a structured local diagnostic that combines:
 - native binary discovery
 - packaged artifact visibility
 - an optional `status --json` auth probe through the resolved bridge
+- an optional `search --json` probe when `--probe-search <query>` is provided

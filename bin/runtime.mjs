@@ -1,0 +1,144 @@
+import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { delimiter, resolve } from "node:path";
+import { readArtifactManifest, resolveNativeBinary } from "./native-runtime.mjs";
+
+function ensureAbsolutePath(basePath, inputPath) {
+  if (!inputPath) {
+    return null;
+  }
+
+  return inputPath.startsWith("/") ? inputPath : resolve(basePath, inputPath);
+}
+
+function commandExists(commandName, env = process.env) {
+  const pathValue = env.PATH || "";
+  const pathExtValue = env.PATHEXT || ".EXE;.CMD;.BAT;.COM";
+  const executableSuffixes =
+    process.platform === "win32" ? pathExtValue.split(";").filter(Boolean) : [""];
+
+  return pathValue.split(delimiter).some((entry) =>
+    executableSuffixes.some((suffix) => existsSync(resolve(entry, `${commandName}${suffix.toLowerCase()}`))),
+  );
+}
+
+export function resolveXiaohongshuCommand(packageRoot, env = process.env) {
+  const explicitBin = ensureAbsolutePath(
+    process.cwd(),
+    env.XIAOHONGSHU_MCP_BIN ?? env.Z0_XIAOHONGSHU_BIN,
+  );
+
+  if (explicitBin && existsSync(explicitBin)) {
+    return { command: explicitBin, args: [], cwd: packageRoot };
+  }
+
+  const sourceRoot = ensureAbsolutePath(
+    packageRoot,
+    env.XIAOHONGSHU_MCP_SOURCE_ROOT ?? env.Z0_XIAOHONGSHU_SOURCE_ROOT ?? "./legacy",
+  );
+
+  if (sourceRoot && existsSync(sourceRoot) && commandExists("uv", env)) {
+    return {
+      command: "uv",
+      args: ["run", "--project", sourceRoot, "xhs"],
+      cwd: packageRoot,
+    };
+  }
+
+  if (sourceRoot && existsSync(sourceRoot)) {
+    return {
+      command: env.XIAOHONGSHU_MCP_PYTHON_BIN ?? env.Z0_XIAOHONGSHU_PYTHON_BIN ?? "python3",
+      args: ["-m", "xhs_cli.cli"],
+      cwd: sourceRoot,
+    };
+  }
+
+  throw new Error(
+    "Xiaohongshu CLI bridge was not found. Set `XIAOHONGSHU_MCP_BIN` or provide a vendored legacy root via `XIAOHONGSHU_MCP_SOURCE_ROOT`.",
+  );
+}
+
+export function executeXiaohongshuCommand(packageRoot, cliArgs, env = process.env) {
+  let resolved;
+
+  try {
+    resolved = resolveXiaohongshuCommand(packageRoot, env);
+  } catch (error) {
+    return {
+      error: true,
+      message: error instanceof Error ? error.message : String(error),
+      status: 1,
+    };
+  }
+
+  const result = spawnSync(resolved.command, [...resolved.args, ...cliArgs], {
+    cwd: resolved.cwd,
+    encoding: "utf8",
+    env,
+  });
+
+  if (result.status !== 0) {
+    return {
+      error: true,
+      message: (result.stderr || result.stdout || "").trim() || "xiaohongshu-cli execution failed",
+      status: result.status ?? 1,
+    };
+  }
+
+  const stdout = (result.stdout || "").trim();
+
+  try {
+    return JSON.parse(stdout);
+  } catch {
+    return { ok: true, rawText: stdout };
+  }
+}
+
+export function selfCheckXiaohongshuRuntime(packageRoot, env = process.env) {
+  const sourceRoot = ensureAbsolutePath(
+    packageRoot,
+    env.XIAOHONGSHU_MCP_SOURCE_ROOT ?? env.Z0_XIAOHONGSHU_SOURCE_ROOT ?? "./legacy",
+  );
+  const explicitBin = ensureAbsolutePath(
+    process.cwd(),
+    env.XIAOHONGSHU_MCP_BIN ?? env.Z0_XIAOHONGSHU_BIN,
+  );
+  const nativeOverride = ensureAbsolutePath(
+    process.cwd(),
+    env.XIAOHONGSHU_MCP_CLI_BIN ?? env.Z0_XIAOHONGSHU_CLI_BIN,
+  );
+  const uvAvailable = commandExists("uv", env);
+  const artifactManifest = readArtifactManifest(packageRoot);
+  let nativeBinary = null;
+
+  try {
+    nativeBinary = resolveNativeBinary(packageRoot, env);
+  } catch {}
+
+  try {
+    const resolved = resolveXiaohongshuCommand(packageRoot, env);
+    return {
+      ok: true,
+      resolution: resolved,
+      nativeBinary,
+      nativeBinaryPresent: Boolean(nativeBinary),
+      nativeBinaryOverridePresent: Boolean(nativeOverride && existsSync(nativeOverride)),
+      packagedArtifacts: artifactManifest.artifacts,
+      explicitBinPresent: Boolean(explicitBin && existsSync(explicitBin)),
+      legacyRootPresent: Boolean(sourceRoot && existsSync(sourceRoot)),
+      uvAvailable,
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : String(error),
+      nativeBinary,
+      nativeBinaryPresent: Boolean(nativeBinary),
+      nativeBinaryOverridePresent: Boolean(nativeOverride && existsSync(nativeOverride)),
+      packagedArtifacts: artifactManifest.artifacts,
+      explicitBinPresent: Boolean(explicitBin && existsSync(explicitBin)),
+      legacyRootPresent: Boolean(sourceRoot && existsSync(sourceRoot)),
+      uvAvailable,
+    };
+  }
+}

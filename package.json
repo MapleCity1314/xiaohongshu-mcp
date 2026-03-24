@@ -1,0 +1,48 @@
+{
+  "name": "@presto1314w/xiaohongshu-mcp",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "xiaohongshu-mcp": "./bin/xiaohongshu-mcp.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "README.md",
+    "SKILL.md",
+    "agents",
+    "bin",
+    "dist",
+    "legacy"
+  ],
+  "scripts": {
+    "build": "pnpm run build:ts && pnpm run build:native",
+    "build:ts": "pnpm exec tsc -p tsconfig.build.json",
+    "build:native": "node ./scripts/build-native.mjs",
+    "lint": "biome lint .",
+    "format": "biome format --write src test bin scripts",
+    "check-types": "pnpm exec tsc --noEmit",
+    "prepack": "pnpm run build",
+    "release:pack": "node ./scripts/release-package.mjs",
+    "release:matrix": "node ./scripts/release-matrix.mjs",
+    "test:node": "node --test ./test/*.test.mjs",
+    "test:native": "cargo test --manifest-path ./native/Cargo.toml",
+    "test": "pnpm run test:native && pnpm run test:node"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.0",
+    "@types/node": "^24.5.2",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.11.1"
+  }
+}

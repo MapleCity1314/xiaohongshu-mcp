@@ -1,0 +1,4 @@
+interface:
+  display_name: "Xiaohongshu MCP"
+  short_description: "MCP tools for Xiaohongshu workflows"
+  default_prompt: "Use $xiaohongshu-mcp to search Xiaohongshu, read notes, inspect users, and diagnose runtime bridge issues."

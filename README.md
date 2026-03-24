@@ -1,59 +1,45 @@
 # @presto1314w/xiaohongshu-mcp
 
-Independent Xiaohongshu MCP server with a Rust native bridge and a vendored legacy Python fallback.
+An independent Xiaohongshu MCP server focused on read-only information retrieval.
 
-Current repository focus: read-only Xiaohongshu information retrieval.
+It exposes a stable MCP surface for searching Xiaohongshu, reading notes, fetching comments, inspecting users, and checking local runtime health. Under the hood it prefers a Rust native bridge and falls back to a vendored legacy Python CLI when needed.
 
-The MCP surface in this repository is intentionally limited to reads and diagnostics:
+## Scope
 
-- auth status and runtime self-check
-- profile reads
+Current MCP scope is intentionally read-only:
+
+- auth status and runtime diagnostics
 - search and topic discovery
 - note detail and comments
 - user lookup and user posts
 - feed, hot items, favorites, unread counts, notifications
 
-It does not currently expose write operations such as posting, liking, commenting, following, or deleting through MCP.
+Non-goals for the current repository:
 
-Current shape:
+- posting notes
+- liking or unliking
+- comment mutations
+- follow or unfollow
+- delete operations
 
-- npm-bootable MCP server: `xiaohongshu-mcp`
-- native CLI shim under `native/`
-- vendored legacy Python CLI under `legacy/`
-- generic skill metadata for agent registration
+## Package
 
-The MCP server is started via:
+MCP endpoint:
 
 ```text
 npm:@presto1314w/xiaohongshu-mcp
 ```
 
-Useful environment variables:
+Primary entrypoints:
 
-- `XIAOHONGSHU_MCP_BIN`: explicit `xhs` executable path
-- `XIAOHONGSHU_MCP_CLI_BIN`: explicit native `xiaohongshu-cli` binary path
-- `XIAOHONGSHU_MCP_SOURCE_ROOT`: override the vendored legacy source root
-- `XIAOHONGSHU_MCP_PYTHON_BIN`: override the Python interpreter for module execution
-- `XIAOHONGSHU_MCP_RELEASE_TARGETS`: release matrix target list
+- `bin/xiaohongshu-mcp.mjs`: MCP server
+- `scripts/self-check.mjs`: local CLI diagnostics
+- `native/`: Rust bridge
+- `legacy/`: vendored Python fallback
 
-The older `Z0_XIAOHONGSHU_*` variables are still accepted as compatibility aliases.
+## MCP Tools
 
-Resolution order:
-
-1. `XIAOHONGSHU_MCP_CLI_BIN`
-2. packaged native binary under `dist/native/<platform>-<arch>/`
-3. local cargo binary under `native/target/{release,debug}/`
-4. `XIAOHONGSHU_MCP_BIN`
-5. `uv run --project <legacy-root> xhs`
-6. `python3 -m xhs_cli.cli` from the vendored `<legacy-root>`
-
-The native layer already supports live note reads. Other commands still fall back to the vendored CLI or structured fixture responses when the bridge is unavailable.
-
-Diagnostic MCP tool:
-
-- `xiaohongshu_runtime_self_check`
-
-Read-only MCP tools:
+Read and diagnostic tools currently exported:
 
 - `xiaohongshu_auth_status`
 - `xiaohongshu_runtime_self_check`
@@ -72,17 +58,43 @@ Read-only MCP tools:
 - `xiaohongshu_unread`
 - `xiaohongshu_notifications`
 
-Typical read workflow:
+Recommended read flow:
 
-1. Check bridge and auth state with `xiaohongshu_runtime_self_check` and `xiaohongshu_auth_status`.
-2. Search with `xiaohongshu_search` or `xiaohongshu_topics`.
-3. Read note content with `xiaohongshu_note_detail`.
-4. Pull discussion with `xiaohongshu_comments`.
-5. Expand to authors with `xiaohongshu_user_lookup` and `xiaohongshu_user_posts`.
+1. Run `xiaohongshu_runtime_self_check` when local setup is uncertain.
+2. Run `xiaohongshu_auth_status` when the request may depend on authenticated state.
+3. Use `xiaohongshu_search`, `xiaohongshu_topics`, or `xiaohongshu_search_user` for discovery.
+4. Use `xiaohongshu_note_detail` and `xiaohongshu_comments` for note-level retrieval.
+5. Use `xiaohongshu_user_lookup` and `xiaohongshu_user_posts` to expand from a note to an author.
 
-Additional integration notes live in [references/read-only-workflow.md](/Users/presto/code/work/xiaohongshu-mcp/references/read-only-workflow.md).
+More detail is in [read-only-workflow.md](/Users/presto/code/work/xiaohongshu-mcp/references/read-only-workflow.md).
 
-Development:
+## Runtime Resolution
+
+The bridge resolves in this order:
+
+1. `XIAOHONGSHU_MCP_CLI_BIN`
+2. `dist/native/<platform>-<arch>/xiaohongshu-cli`
+3. `native/target/{release,debug}/xiaohongshu-cli`
+4. `XIAOHONGSHU_MCP_BIN`
+5. `uv run --project <legacy-root> xhs`
+6. `python3 -m xhs_cli.cli`
+
+Compatibility aliases:
+
+- `Z0_XIAOHONGSHU_BIN`
+- `Z0_XIAOHONGSHU_CLI_BIN`
+- `Z0_XIAOHONGSHU_SOURCE_ROOT`
+- `Z0_XIAOHONGSHU_PYTHON_BIN`
+
+Primary environment variables:
+
+- `XIAOHONGSHU_MCP_BIN`
+- `XIAOHONGSHU_MCP_CLI_BIN`
+- `XIAOHONGSHU_MCP_SOURCE_ROOT`
+- `XIAOHONGSHU_MCP_PYTHON_BIN`
+- `XIAOHONGSHU_MCP_RELEASE_TARGETS`
+
+## Local Commands
 
 ```bash
 pnpm install
@@ -93,7 +105,7 @@ pnpm release:pack
 XIAOHONGSHU_MCP_RELEASE_TARGETS=darwin-arm64,linux-x64 pnpm release:matrix
 ```
 
-CLI self-check:
+## Self-Check
 
 ```bash
 pnpm self-check
@@ -102,10 +114,10 @@ pnpm self-check --no-auth-probe
 pnpm self-check --probe-search travel
 ```
 
-This prints a structured local diagnostic that combines:
+`self-check` prints structured local diagnostics covering:
 
-- runtime bridge resolution
+- bridge resolution
 - native binary discovery
 - packaged artifact visibility
-- an optional `status --json` auth probe through the resolved bridge
-- an optional `search --json` probe when `--probe-search <query>` is provided
+- optional auth probe via `status --json`
+- optional search probe via `search --json`

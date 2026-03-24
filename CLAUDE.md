@@ -6,7 +6,7 @@ This file provides guidance to Claude Code when working with this repository.
 
 `@presto1314w/xiaohongshu-mcp` is an independent Xiaohongshu MCP server focused on read-only information retrieval.
 
-Current scope:
+Core repository areas:
 
 - MCP server entrypoint under `bin/`
 - Rust native bridge under `native/`
@@ -19,6 +19,7 @@ Current scope:
 ```bash
 pnpm install
 pnpm self-check
+pnpm self-check --probe-search travel
 pnpm build
 pnpm test
 pnpm release:pack
@@ -29,12 +30,9 @@ pnpm release:pack
 - Treat the current MCP surface as read-only unless the repository explicitly adds write tools later.
 - Prefer MCP tools and runtime diagnostics over ad hoc shell invocations.
 - When debugging local setup, run `pnpm self-check` first.
+- Use `pnpm self-check --probe-search <query>` when you want a lightweight local search-path probe.
 - When changing the MCP tool surface, update:
-  - `README.md`
-  - `SKILL.md`
-  - `.claude/skills/xiaohongshu-mcp/SKILL.md`
-  - `references/read-only-workflow.md`
-  - `test/mcp.test.mjs`
+  `README.md`, `SKILL.md`, `CLAUDE.md`, `.claude/skills/xiaohongshu-mcp/SKILL.md`, `references/read-only-workflow.md`, and `test/mcp.test.mjs`
 
 ## Key Files
 
@@ -49,4 +47,3 @@ pnpm release:pack
 If the task is specifically about Xiaohongshu MCP usage, diagnostics, search, note reads, comments, user lookup, feed, hot items, favorites, unread counts, or notifications, read:
 
 - `.claude/skills/xiaohongshu-mcp/SKILL.md`
-

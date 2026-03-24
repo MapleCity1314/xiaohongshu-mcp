@@ -17,12 +17,18 @@
     }
   },
   "files": [
+    "LICENSE",
     "README.md",
     "SKILL.md",
     "agents",
     "bin",
     "dist",
-    "legacy"
+    "legacy/README.md",
+    "legacy/SCHEMA.md",
+    "legacy/SKILL.md",
+    "legacy/pyproject.toml",
+    "legacy/uv.lock",
+    "legacy/xhs_cli"
   ],
   "scripts": {
     "build": "pnpm run build:ts && pnpm run build:native",
